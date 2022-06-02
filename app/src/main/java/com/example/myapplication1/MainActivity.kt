@@ -1,13 +1,19 @@
 package com.example.myapplication1
 
 import AirplaneModeChangeReceiver
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Intent
 import android.content.IntentFilter
 import android.media.MediaPlayer
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+
 
 class MainActivity : AppCompatActivity() {
     //private var start: Button? = null
@@ -19,6 +25,7 @@ class MainActivity : AppCompatActivity() {
         receiver = AirplaneModeChangeReceiver()
         //start = findViewById<View>(R.id.startButton) as Button
         //stop = findViewById<View>(R.id.stopButton) as Button
+        val start= findViewById<View>(R.id.alarmsetbutton) as Button
         val btn = findViewById<View>(R.id.button) as Button
         var mp:MediaPlayer= MediaPlayer.create(this, R.raw.sample)
 
@@ -30,7 +37,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
 
         }
-
+        start.setOnClickListener { startAlert() }
 
         //start!!.setOnClickListener(this)
         //stop!!.setOnClickListener(this)
@@ -60,7 +67,19 @@ class MainActivity : AppCompatActivity() {
             stopService(Intent(this, servives::class.java))
         }
     }*/
+    fun startAlert() {
+        val text: TextView = findViewById<EditText>(R.id.textView2) as TextView
+        val i = text.text.toString().toInt()
+        val intent = Intent(this, MyBroadcastReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            this.applicationContext, 234324243, intent, 0
+        )
+        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
+                + (i * 1000), pendingIntent);
 
+        Toast.makeText(this, "Alarm set in " + i + " seconds", Toast.LENGTH_LONG).show();
+    }
     override fun onStop() {
         super.onStop()
         unregisterReceiver(receiver)
